@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <filter id="inner-shadow-filter-0" color-interpolation-filters="sRGB" x="-50%" y="-50%" width="200%" height="200%" bx:preset="inner-shadow 1 -10 8 7 0.13 rgba(0,0,0,0.7)">
+      <feOffset dx="-10" dy="8"/>
+      <feGaussianBlur stdDeviation="7"/>
+      <feComposite operator="out" in="SourceGraphic"/>
+      <feComponentTransfer result="choke">
+        <feFuncA type="linear" slope="0.26"/>
+      </feComponentTransfer>
+      <feFlood flood-color="rgba(0,0,0,0.7)" result="color"/>
+      <feComposite operator="in" in="color" in2="choke" result="shadow"/>
+      <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <path style="stroke: rgb(0, 0, 0); stroke-width: 0px; filter: url(#inner-shadow-filter-0); fill: rgb(229, 229, 229); transform-origin: 311.424px 182.02px;" d="M 360.964 323.062 L 423.126 283.255 L 362.87 242.875 L 374.331 274.532 C 174.692 259.855 257.151 85.38 279.337 51.126 L 214.737 40.977 C 209.354 68.055 135.313 281.21 373.925 292.319 L 360.964 323.062 Z"/>
+</svg>
