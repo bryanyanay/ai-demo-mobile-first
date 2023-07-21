@@ -29,7 +29,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setLoading, setResultU
   }
 
   return (
-    <form className={`w-full items-center flex justify-evenly gap-4 ${className}`} onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data" action="http://localhost:8000/segment">
+    <form className={`w-full items-center flex lg:flex-col lg:gap-8 justify-evenly gap-4 ${className}`} onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data" action="http://localhost:8000/segment">
       <input
         type="file"
         id="image-upload"
@@ -43,11 +43,11 @@ function ImageUpload({ className, setImg, img, setImgURL, setLoading, setResultU
           }
         }}
       />
-      <label className="border-mauve border-b-4 p-2 border-dashed text-slate-700 font-medium text-xl text-center 
+      <label className="border-mauve border-b-4 p-2 lg:mt-4 border-dashed text-slate-700 font-medium text-xl text-center 
                         transition-transform duration-300 hover:-translate-y-1
                         hover:cursor-pointer" htmlFor="image-upload">{img ? img.name : "Select an image"}</label>
       <button 
-        className="pl-4 pr-4 h-16 rounded-full bg-mauve 
+        className="pl-4 pr-4 h-16 lg:w-32 lg:h-32 lg:mt-8 rounded-full bg-mauve 
                    text-white font-semibold text-xl 
                    transition duration-200 shadow-md transform hover:scale-110"
         type="submit"
@@ -119,7 +119,7 @@ function EmptyCard({ children, className }) {
 
 function MainDisplay({ className, img, imgURL, loading, resultURL }) {
   return (
-    <div className={`${className} flex flex-col gap-8 p-16 bg-slate-50`} >
+    <div className={`${className} lg:grid lg:grid-rows-2 lg:grid-cols-3 flex flex-col gap-8 p-8 bg-slate-50`} >
       {
         img ? (
           <ImageCard src={imgURL} className="col-start-1 col-end-3" />
@@ -130,7 +130,7 @@ function MainDisplay({ className, img, imgURL, loading, resultURL }) {
       <Image
         src="/arrow5.svg"
         alt="Arrow svg"
-        className="hidden col-start-1 col-end-2 w-full h-full"
+        className="hidden col-start-1 col-end-2 w-full h-full lg:block"
         width="100"
         height="100"
       />
@@ -156,11 +156,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="h-screen w-screen flex flex-col">
-      <div className="overflow-y-auto flex-grow flex flex-col">
-        <ControlBar setImg={setImg} setImgURL={setImgURL} img={img} setLoading={setLoading} setResultURL={setResultURL} className="" />
-        <MainDisplay img={img} imgURL={imgURL} loading={loading} resultURL={resultURL} className="flex-grow" />
-      </div>
+    <div className="h-screen w-screen flex flex-col lg:flex-row">
+      <ControlBar className="lg:w-1/5" setImg={setImg} setImgURL={setImgURL} img={img} setLoading={setLoading} setResultURL={setResultURL} />
+      <MainDisplay img={img} imgURL={imgURL} loading={loading} resultURL={resultURL} className="flex-grow" />
     </div>
   );
 }
