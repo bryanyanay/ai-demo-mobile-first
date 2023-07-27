@@ -3,29 +3,36 @@
 import Image from 'next/image';
 import { useState } from "react";
 
-function ImageUpload({ className, setImg, img, setImgURL, setLoading, setResultURL }) {
+function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResultURL }) {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (img == null) {
       return; // maybe add a notice to select an image in the future
     }
-    setLoading(true);
+    setSegState(1); // loading state
 
     const formData = new FormData(e.target);
-    const res = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/segment/', {
-      method: 'POST',
-      body: formData,
-    });
 
-    if (res.ok) {
-      const resJson = await res.json();
-      const data = await fetch(process.env.NEXT_PUBLIC_API_SERVER + resJson.resultPath);
-      const blob = await data.blob();
-      setResultURL(URL.createObjectURL(blob));
+    try {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_SERVER + '/segment/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const resJson = await res.json();
+        const data = await fetch(process.env.NEXT_PUBLIC_API_SERVER + resJson.resultPath);
+        const blob = await data.blob();
+        setResultURL(URL.createObjectURL(blob));
+        setLoading(0); // normal state
+      } else {
+        setSegState(2); // error retry state
+      }
+    } catch (e) {
+      console.error("WE GOT AN ERROR, IT HAPPENS LMAO: ", e);
+      setSegState(2); // error retry state
     }
-
-    setLoading(false);
   }
 
   return (
@@ -75,11 +82,11 @@ function LogoDisplay({ className }) {
   )
 }
 
-function ControlBar({ className, setImg, img, setImgURL, setLoading, setResultURL }) {
+function ControlBar({ className, setImg, img, setImgURL, setSegState, setResultURL }) {
   return (
     <div className={`w-full shadow-[0_-1px_15px_rgba(0,0,0,0.25)] bg-slate-200 flex flex-col items-center p-8 gap-8 ${className}`}>
       <LogoDisplay /> 
-      <ImageUpload setImg={setImg} setImgURL={setImgURL} setLoading={setLoading} setResultURL={setResultURL} img={img} />
+      <ImageUpload setImg={setImg} setImgURL={setImgURL} setSegState={setSegState} setResultURL={setResultURL} img={img} />
     </div>
   )
 }
@@ -117,7 +124,19 @@ function EmptyCard({ children, className }) {
   )
 }
 
-function MainDisplay({ className, img, imgURL, loading, resultURL }) {
+function MainDisplay({ className, img, imgURL, segState, resultURL }) {
+  let card;
+  if (segState == 0) { // normal
+    if (resultURL == "") {
+      card = <EmptyCard className="col-start-2 col-end-4">Segmented Image</EmptyCard>;
+    } else {
+      card = <ImageCard src={resultURL} className="col-start-2 col-end-4" />;
+    }
+  } else if (segState == 1) { // loading
+    card = <EmptyCard className="col-start-2 col-end-4 animate-pulse">Processing...</EmptyCard>;
+  } else { // error
+    card = <EmptyCard className="col-start-2 col-end-4 text-red-700 border-red-700">ERROR: RETRY</EmptyCard>;
+  }
   return (
     <div className={`${className} lg:grid lg:grid-rows-2 lg:grid-cols-3 flex flex-col gap-8 p-8 bg-slate-50`} >
       {
@@ -134,17 +153,7 @@ function MainDisplay({ className, img, imgURL, loading, resultURL }) {
         width="100"
         height="100"
       />
-      { 
-        loading ? (
-          <EmptyCard className="col-start-2 col-end-4 animate-pulse">Processing...</EmptyCard>
-        ) : (
-          (resultURL == "") ? (
-            <EmptyCard className="col-start-2 col-end-4">Segmented Image</EmptyCard>
-          ) : (
-            <ImageCard src={resultURL} className="col-start-2 col-end-4" />
-          )
-        )
-      }
+      {card}
     </div>
   )
 }
@@ -153,12 +162,12 @@ export default function Home() {
   const [img, setImg] = useState(null);
   const [imgURL, setImgURL] = useState("");
   const [resultURL, setResultURL] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [segState, setSegState] = useState(0); // 0 - normal (either no image segmented yet, or one successfully segmented, depending on resultURL), 1 - loading, 2 - error retry
 
   return (
     <div className="h-screen w-screen flex flex-col lg:flex-row">
-      <ControlBar className="lg:w-1/5" setImg={setImg} setImgURL={setImgURL} img={img} setLoading={setLoading} setResultURL={setResultURL} />
-      <MainDisplay img={img} imgURL={imgURL} loading={loading} resultURL={resultURL} className="flex-grow" />
+      <ControlBar className="lg:w-1/5" setImg={setImg} setImgURL={setImgURL} img={img} setSegState={setSegState} setResultURL={setResultURL} />
+      <MainDisplay img={img} imgURL={imgURL} segState={segState} resultURL={resultURL} className="flex-grow" />
     </div>
   );
 }
