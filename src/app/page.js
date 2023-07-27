@@ -25,7 +25,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
         const data = await fetch(process.env.NEXT_PUBLIC_API_SERVER + resJson.resultPath);
         const blob = await data.blob();
         setResultURL(URL.createObjectURL(blob));
-        setLoading(0); // normal state
+        setSegState(0); // normal state
       } else {
         setSegState(2); // error retry state
       }
@@ -135,7 +135,7 @@ function MainDisplay({ className, img, imgURL, segState, resultURL }) {
   } else if (segState == 1) { // loading
     card = <EmptyCard className="col-start-2 col-end-4 animate-pulse">Processing...</EmptyCard>;
   } else { // error
-    card = <EmptyCard className="col-start-2 col-end-4 text-red-700 border-red-700">ERROR: RETRY</EmptyCard>;
+    card = <EmptyCard className="col-start-2 col-end-4">ERROR: RETRY</EmptyCard>;
   }
   return (
     <div className={`${className} lg:grid lg:grid-rows-2 lg:grid-cols-3 flex flex-col gap-8 p-8 bg-slate-50`} >
