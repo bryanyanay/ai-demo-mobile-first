@@ -19,13 +19,16 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
         method: 'POST',
         body: formData,
       });
-
       if (res.ok) {
         const resJson = await res.json();
         const data = await fetch(process.env.NEXT_PUBLIC_API_SERVER + resJson.resultPath);
-        const blob = await data.blob();
-        setResultURL(URL.createObjectURL(blob));
-        setSegState(0); // normal state
+        if (data.ok) {
+          const blob = await data.blob();
+          setResultURL(URL.createObjectURL(blob));
+          setSegState(0); // normal state
+        } else {
+          setSegState(2); // error retry state
+        }
       } else {
         setSegState(2); // error retry state
       }
