@@ -8,7 +8,8 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (img == null) {
-      return; // maybe add a notice to select an image in the future
+      alert("Please select an image first!")
+      return; 
     }
     setSegState(1); // loading state
 
@@ -39,25 +40,37 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
   }
 
   return (
-    <form className={`w-full items-center flex lg:flex-col lg:gap-8 justify-evenly gap-4 ${className}`} onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data" action="http://localhost:8000/segment">
-      <input
-        type="file"
-        id="image-upload"
-        accept="image/*"
-        className="w-4/5"
-        name="image"
-        onChange={(e) => {
-          if (e.target.files.length > 0) {
-            setImg(e.target.files[0]);
-            setImgURL(URL.createObjectURL(e.target.files[0]));
-          }
-        }}
-      />
-      <label className="border-mauve border-b-4 p-2 lg:mt-4 border-dashed text-slate-700 font-medium text-xl text-center 
-                        transition-transform duration-300 hover:-translate-y-1
-                        hover:cursor-pointer" htmlFor="image-upload">{img ? img.name : "Select an image"}</label>
+    <form className={`w-full items-center flex flex-col lg:gap-8 justify-evenly gap-4 ${className}`} onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data" action="http://localhost:8000/segment">
+      <div className="flex justify-evenly w-full gap-4 lg:flex-col">
+        <input
+          type="file"
+          id="image-upload"
+          accept="image/*"
+          className="w-4/5"
+          name="image"
+          onChange={(e) => {
+            if (e.target.files.length > 0) {
+              setImg(e.target.files[0]);
+              setImgURL(URL.createObjectURL(e.target.files[0]));
+            }
+          }}
+        />
+        <label className="border-mauve border-b-4 p-2 border-dashed text-slate-700 font-medium text-lg text-center 
+                          transition-transform duration-300 hover:-translate-y-1 hover:cursor-pointer" 
+              htmlFor="image-upload">{img ? img.name : "Select an image"}</label>
+
+        <select id="model-select" name="model" required style={{textAlignLast: "center"}}
+          className="border-mauve border-b-4 p-2 border-dashed
+                     text-slate-700 font-medium text-lg p-2.5 bg-slate-200
+                     transition-transform duration-300 hover:-translate-y-1 hover:cursor-pointer">
+          <option value="" selected>Select a model</option>
+          <option value="pspnet">PSPNet</option>
+          <option value="segformer">Segformer</option>
+        </select>
+      </div>
+
       <button 
-        className="pl-4 pr-4 h-16 lg:w-32 lg:h-32 lg:mt-8 rounded-full bg-mauve 
+        className="pl-4 pr-4 h-16 mt-4 lg:w-32 lg:h-32 lg:mt-0 rounded-full bg-mauve 
                    text-white font-semibold text-xl 
                    transition duration-200 shadow-md transform hover:scale-110"
         type="submit"
@@ -169,7 +182,7 @@ export default function Home() {
 
   return (
     <div className="h-screen w-screen flex flex-col lg:flex-row">
-      <ControlBar className="lg:w-1/5" setImg={setImg} setImgURL={setImgURL} img={img} setSegState={setSegState} setResultURL={setResultURL} />
+      <ControlBar className="lg:w-1/4" setImg={setImg} setImgURL={setImgURL} img={img} setSegState={setSegState} setResultURL={setResultURL} />
       <MainDisplay img={img} imgURL={imgURL} segState={segState} resultURL={resultURL} className="flex-grow" />
     </div>
   );
