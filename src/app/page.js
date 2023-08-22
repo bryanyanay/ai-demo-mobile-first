@@ -60,7 +60,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
               htmlFor="image-upload">{img ? img.name : "Select an image"}</label>
 
         <select id="model-select" name="model" required style={{textAlignLast: "center"}}
-          className="border-mauve border-b-4 p-2 border-dashed
+          className="border-mauve border-b-4 p-2 border-dashed rounded-none
                      text-slate-700 font-medium text-lg p-2.5 bg-slate-200
                      transition-transform duration-300 hover:-translate-y-1 hover:cursor-pointer">
           <option value="" selected>Select a model</option>
@@ -153,6 +153,7 @@ function MainDisplay({ className, img, imgURL, segState, resultURL }) {
   } else { // error
     card = <EmptyCard className="col-start-2 col-end-4">ERROR: RETRY</EmptyCard>;
   }
+  
   return (
     <div className={`${className} lg:grid lg:grid-rows-2 lg:grid-cols-3 flex flex-col gap-8 p-8 bg-slate-50`} >
       {
