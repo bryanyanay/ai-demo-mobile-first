@@ -41,7 +41,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
 
   return (
     <form className={`w-full items-center flex flex-col lg:gap-8 justify-evenly gap-4 ${className}`} onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data" action="http://localhost:8000/segment">
-      <div className="flex justify-evenly w-full gap-4 lg:flex-col">
+      <div className="flex justify-evenly w-full gap-8 lg:flex-col">
         <input
           type="file"
           id="image-upload"
