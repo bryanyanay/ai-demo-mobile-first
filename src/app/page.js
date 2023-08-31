@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from "react";
 
-function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResultURL }) {
+function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResultURL, setNpkStr }) {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -22,10 +22,21 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
       });
       if (res.ok) {
         const resJson = await res.json();
+        const N = resJson.N;
+        const P = resJson.P;
+        const K = resJson.K;
+
         const data = await fetch(process.env.NEXT_PUBLIC_API_SERVER + resJson.resultPath);
         if (data.ok) {
           const blob = await data.blob();
           setResultURL(URL.createObjectURL(blob));
+
+          const sArr = [N, P, K];
+          const fArr = sArr.map(str => parseFloat(str));
+          const rfArr = fArr.map(float => Math.round(float * 10) / 10);
+
+          setNpkStr(rfArr.join(":"));
+          
           setSegState(0); // normal state
         } else {
           setSegState(2); // error retry state
@@ -63,7 +74,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
           className="border-mauve border-b-4 p-2 border-dashed rounded-none
                      text-slate-700 font-medium text-lg p-2.5 bg-slate-200
                      transition-transform duration-300 hover:-translate-y-1 hover:cursor-pointer">
-          <option value="" selected>Select a model</option>
+          <option value="" defaultValue>Select a model</option>
           <option value="pspnet">PSPNet</option>
           <option value="segformer">Segformer</option>
         </select>
@@ -98,11 +109,11 @@ function LogoDisplay({ className }) {
   )
 }
 
-function ControlBar({ className, setImg, img, setImgURL, setSegState, setResultURL }) {
+function ControlBar({ className, setImg, img, setImgURL, setSegState, setResultURL, setNpkStr }) {
   return (
     <div className={`w-full shadow-[0_-1px_15px_rgba(0,0,0,0.25)] bg-slate-200 flex flex-col items-center p-8 gap-8 ${className}`}>
       <LogoDisplay /> 
-      <ImageUpload setImg={setImg} setImgURL={setImgURL} setSegState={setSegState} setResultURL={setResultURL} img={img} />
+      <ImageUpload setImg={setImg} setNpkStr={setNpkStr} setImgURL={setImgURL} setSegState={setSegState} setResultURL={setResultURL} img={img} />
     </div>
   )
 }
@@ -140,7 +151,30 @@ function EmptyCard({ children, className }) {
   )
 }
 
-function MainDisplay({ className, img, imgURL, segState, resultURL }) {
+function NPKDisplay({ className, text }) {
+  return (
+    <div className={`w-full
+    transition-transform duration-300 hover:-translate-y-2 
+    text-2xl text-slate-500 font-bold text-center
+    flex flex-col justify-center gap-6
+    border-none rounded-xl p-6 bg-white shadow-lg ${className}`} 
+    >
+      <div className="flex flex-row justify-center">
+        <div className="group relative w-max">
+          <span className="border-b-4 p-2 pb-1 border-dashed w-max">NPK Ratio</span> 
+          <span className="bg-black text-slate-300 p-1 pl-2 pr-2 rounded-xl text-lg font-normal pointer-events-none absolute lg:-bottom-28 -bottom-28 -left-20 lg:-left-12 w-[80vw] lg:w-[20vw] opacity-0 transition-opacity group-hover:opacity-100" >
+            Ratio of nitrogen to phosphorus to potassium in the resulting compost.
+          </span>
+        </div>
+      </div>
+      <p className="text-5xl">
+        {text}
+      </p>
+    </div>
+  )
+}
+
+function MainDisplay({ className, img, imgURL, segState, resultURL, npkStr }) {
   let card;
   if (segState == 0) { // normal
     if (resultURL == "") {
@@ -156,6 +190,7 @@ function MainDisplay({ className, img, imgURL, segState, resultURL }) {
   
   return (
     <div className={`${className} lg:grid lg:grid-rows-2 lg:grid-cols-3 flex flex-col gap-8 p-8 bg-slate-50`} >
+      <NPKDisplay className="col-start-3 row-start-1 row-end-2" text={npkStr} />
       {
         img ? (
           <ImageCard src={imgURL} className="col-start-1 col-end-3" />
@@ -179,12 +214,13 @@ export default function Home() {
   const [img, setImg] = useState(null);
   const [imgURL, setImgURL] = useState("");
   const [resultURL, setResultURL] = useState("");
+  const [npkStr, setNpkStr] = useState("X:X:X");
   const [segState, setSegState] = useState(0); // 0 - normal (either no image segmented yet, or one successfully segmented, depending on resultURL), 1 - loading, 2 - error retry
 
   return (
     <div className="h-screen w-screen flex flex-col lg:flex-row">
-      <ControlBar className="lg:w-1/4" setImg={setImg} setImgURL={setImgURL} img={img} setSegState={setSegState} setResultURL={setResultURL} />
-      <MainDisplay img={img} imgURL={imgURL} segState={segState} resultURL={resultURL} className="flex-grow" />
+      <ControlBar className="lg:w-1/4" setNpkStr={setNpkStr} setImg={setImg} setImgURL={setImgURL} img={img} setSegState={setSegState} setResultURL={setResultURL} />
+      <MainDisplay img={img} imgURL={imgURL} segState={segState} resultURL={resultURL} npkStr={npkStr} className="flex-grow" />
     </div>
   );
 }
