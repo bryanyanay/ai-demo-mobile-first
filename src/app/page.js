@@ -33,7 +33,9 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
 
           const sArr = [N, P, K];
           const fArr = sArr.map(str => parseFloat(str));
-          const rfArr = fArr.map(float => Math.round(float * 10) / 10);
+          const minF = Math.min(...fArr);
+          const nfArr = fArr.map(element => element / minF);
+          const rfArr = nfArr.map(float => Math.round(float));
 
           setNpkStr(rfArr.join(":"));
           
