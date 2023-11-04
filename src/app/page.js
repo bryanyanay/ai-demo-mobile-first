@@ -77,7 +77,7 @@ function ImageUpload({ className, setImg, img, setImgURL, setSegState, setResult
                      text-slate-700 font-medium text-lg p-2.5 bg-slate-200
                      transition-transform duration-300 hover:-translate-y-1 hover:cursor-pointer">
           <option value="" defaultValue>Select a model</option>
-          <option value="pspnet">PSPNet</option>
+          {/*<option value="pspnet">PSPNet</option>*/}
           <option value="segformer">Segformer</option>
         </select>
       </div>
